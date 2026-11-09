@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Outfit Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #e8eaf6);
+      color: #29243a; display: flex; justify-content: center; align-items: center;
+      padding: 20px;
+    }
+    .app {
+      width: 100%; max-width: 620px; background: #fff; border-radius: 24px;
+      padding: 28px; box-shadow: 0 14px 40px rgba(60, 40, 90, .15);
+    }
+    h1 { text-align: center; margin: 0 0 8px; color: #7b3f8c; }
+    .subtitle { text-align: center; color: #777; margin: 0 0 24px; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    label { font-weight: bold; font-size: 14px; display: block; margin-bottom: 7px; }
+    select {
+      width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px;
+      background: #fafafa; font-size: 15px;
+    }
+    button {
+      width: 100%; border: 0; border-radius: 14px; padding: 14px;
+      font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px;
+      background: #8e44ad; color: white; transition: .2s;
+    }
+    button:hover { background: #71368a; transform: translateY(-1px); }
+    .result {
+      margin-top: 22px; padding: 20px; border-radius: 18px;
+      background: #f8f2fb; text-align: center; display: none;
+    }
+    .result h2 { margin: 0 0 12px; color: #7b3f8c; }
+    .look { font-size: 42px; line-height: 1.5; }
+    .result p { margin: 8px 0; line-height: 1.5; }
+    .tip { color: #777; font-size: 13px; margin-top: 14px !important; }
+    @media (max-width: 460px) {
+      .app { padding: 22px; }
+      .controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>👗 Outfit Generator</h1>
+    <p class="subtitle">Find a cute outfit for your day!</p>
+
+    <div class="controls">
+      <div>
+        <label for="style">Outfit style</label>
+        <select id="style">
+          <option value="any">Surprise me</option>
+          <option value="casual">Casual</option>
+          <option value="cute">Cute</option>
+          <option value="formal">Formal</option>
+          <option value="streetwear">Streetwear</option>
+        </select>
+      </div>
+      <div>
+        <label for="weather">Weather</label>
+        <select id="weather">
+          <option value="sunny">Sunny / Hot</option>
+          <option value="rainy">Rainy</option>
+          <option value="cold">Cold</option>
+          <option value="any">Any weather</option>
+        </select>
+      </div>
+      <div>
+        <label for="occasion">Occasion</label>
+        <select id="occasion">
+          <option value="school">School</option>
+          <option value="hangout">Hangout</option>
+          <option value="date">Date</option>
+          <option value="work">Work / Formal event</option>
+          <option value="any">Any occasion</option>
+        </select>
+      </div>
+      <div>
+        <label for="color">Color preference</label>
+        <select id="color">
+          <option value="any">Any color</option>
+          <option value="black">Black</option>
+          <option value="white">White</option>
+          <option value="pink">Pink</option>
+          <option value="blue">Blue</option>
+          <option value="neutral">Neutral colors</option>
+        </select>
+      </div>
+    </div>
+
+    <button onclick="generateOutfit()">✨ Generate Outfit</button>
+
+    <section class="result" id="result" aria-live="polite">
+      <h2>Your Outfit Idea</h2>
+      <div class="look" id="look"></div>
+      <p id="outfitText"></p>
+      <p id="accessories"></p>
+      <p class="tip" id="tip"></p>
+    </section>
+  </main>
+
+  <script>
+    const outfits = [
+      { style: "casual", weather: ["sunny", "any"], occasion: ["school", "hangout", "any"],
+        top: "T-shirt", bottom: "denim shorts", shoes: "white sneakers", emoji: "👕 🩳 👟",
+        accessory: "A small shoulder bag and simple earrings", colors: ["white", "blue", "black", "neutral"] },
+      { style: "cute", weather: ["sunny", "any"], occasion: ["date", "hangout", "any"],
+        top: "pastel blouse", bottom: "pleated skirt", shoes: "Mary Jane shoes", emoji: "👚 👗 👞",
+        accessory: "A cute hair clip and mini handbag", colors: ["pink", "white", "blue"] },
+      { style: "formal", weather: ["any", "cold"], occasion: ["work", "date", "any"],
+        top: "blazer with a blouse", bottom: "tailored trousers", shoes: "loafers or heels", emoji: "👔 🧥 👖 👠",
+        accessory: "A watch and elegant handbag", colors: ["black", "white", "blue", "neutral"] },
+      { style: "streetwear", weather: ["sunny", "any"], occasion: ["hangout", "school", "any"],
+        top: "oversized graphic tee", bottom: "cargo pants", shoes: "chunky sneakers", emoji: "👕 👖 👟",
+        accessory: "A cap and crossbody bag", colors: ["black", "white", "blue"] },
+      { style: "casual", weather: ["rainy", "cold", "any"], occasion: ["school", "hangout", "any"],
+        top: "hoodie", bottom: "straight-leg jeans", shoes: "water-resistant sneakers", emoji: "🧥 👖 👟",
+        accessory: "A backpack and umbrella", colors: ["black", "blue", "neutral"] },
+      { style: "cute", weather: ["cold", "rainy", "any"], occasion: ["date", "hangout", "any"],
+        top: "knit sweater", bottom: "long skirt", shoes: "ankle boots", emoji: "🧶 👗 👢",
+        accessory: "A scarf and small handbag", colors: ["pink", "white", "black", "neutral"] },
+      { style: "formal", weather: ["sunny", "any"], occasion: ["work", "any"],
+        top: "short-sleeve button-up shirt", bottom: "midi skirt", shoes: "flats", emoji: "👚 👗 🥿",
+        accessory: "A simple necklace and tote bag", colors: ["white", "blue", "black", "neutral"] },
+      { style: "streetwear", weather: ["cold", "rainy", "any"], occasion: ["hangout", "any"],
+        top: "layered sweatshirt and jacket", bottom: "wide-leg pants", shoes: "high-top sneakers", emoji: "🧥 👖 👟",
+        accessory: "A beanie and backpack", colors: ["black", "blue", "neutral"] }
+    ];
+
+    function generateOutfit() {
+      const style = document.getElementById("style").value;
+      const weather = document.getElementById("weather").value;
+      const occasion = document.getElementById("occasion").value;
+      const color = document.getElementById("color").value;
+
+      let choices = outfits.filter(item =>
+        (style === "any" || item.style === style) &&
+        (weather === "any" || item.weather.includes(weather)) &&
+        (occasion === "any" || item.occasion.includes(occasion)) &&
+        (color === "any" || item.colors.includes(color))
+      );
+
+      // If the selections are too specific, relax the occasion/color filters.
+      if (choices.length === 0) {
+        choices = outfits.filter(item =>
+          (style === "any" || item.style === style) &&
+          (weather === "any" || item.weather.includes(weather))
+        );
+      }
+      if (choices.length === 0) choices = outfits;
+
+      const outfit = choices[Math.floor(Math.random() * choices.length)];
+      document.getElementById("look").textContent = outfit.emoji;
+      document.getElementById("outfitText").textContent =
+        "Wear a " + outfit.top + " with " + outfit.bottom + " and " + outfit.shoes + ".";
+      document.getElementById("accessories").textContent = "Accessories: " + outfit.accessory + ".";
+      document.getElementById("tip").textContent =
+        weather === "rainy" ? "Style tip: Bring an umbrella and choose shoes that can handle rain."
+        : weather === "sunny" ? "Style tip: Stay cool and consider sunscreen."
+        : weather === "cold" ? "Style tip: Layer up to stay warm."
+        : "Style tip: Mix and match pieces to make the look your own!";
+      document.getElementById("result").style.display = "block";
+    }
+  </script>
+</body>
+</html>
